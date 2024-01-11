@@ -90,6 +90,7 @@ type RediStore struct {
 	maxLength     int
 	keyPrefix     string
 	serializer    SessionSerializer
+	renewTime
 }
 
 // SetMaxLength sets RediStore.maxLength if the `l` argument is greater or equal 0
@@ -102,6 +103,10 @@ func (s *RediStore) SetMaxLength(l int) {
 	if l >= 0 {
 		s.maxLength = l
 	}
+}
+
+func (s *RedisStore) SetRenewTime(t int) {
+	s.renewTime = t
 }
 
 // SetKeyPrefix set the prefix
@@ -347,6 +352,23 @@ func (s *RediStore) load(session *sessions.Session) (bool, error) {
 	if err != nil {
 		return false, err
 	}
+
+	if s.renewTime > 0 {
+		// Get the TTL of the session key
+		ttl, err := redis.Int(conn.Do("TTL", s.keyPrefix+session.ID))
+		if err != nil {
+			return false, err
+		}
+
+		// If the TTL is less than s.renewTime, renew the session key
+		if ttl < s.renewTime {
+			_, err := conn.Do("EXPIRE", s.keyPrefix+session.ID, s.renewTime)
+			if err != nil {
+				return false, err
+			}
+		}
+	}
+
 	return true, s.serializer.Deserialize(b, session)
 }
 
