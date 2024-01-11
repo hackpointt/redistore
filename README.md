@@ -5,6 +5,9 @@
 
 A session store backend for [gorilla/sessions](http://www.gorillatoolkit.org/pkg/sessions) - [src](https://github.com/gorilla/sessions).
 
+## Fork
+To support renew session's expire time. 
+
 ## Requirements
 
 Depends on the [Redigo](https://github.com/gomodule/redigo) Redis library.
