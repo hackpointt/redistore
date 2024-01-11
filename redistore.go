@@ -90,7 +90,7 @@ type RediStore struct {
 	maxLength     int
 	keyPrefix     string
 	serializer    SessionSerializer
-	renewTime
+	renewTime     int
 }
 
 // SetMaxLength sets RediStore.maxLength if the `l` argument is greater or equal 0
@@ -105,7 +105,7 @@ func (s *RediStore) SetMaxLength(l int) {
 	}
 }
 
-func (s *RedisStore) SetRenewTime(t int) {
+func (s *RediStore) SetRenewTime(t int) {
 	s.renewTime = t
 }
 
